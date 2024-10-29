@@ -1,5 +1,6 @@
 import express from 'express';
 import service from '../services/userService.js';
+import userService from '../services/userService.js';
 
 const routes = express.Router();
 
@@ -41,5 +42,21 @@ routes.post('/', async(req, res) => {
         return res.status(500).send({ success: false, message: "Erro interno do servidor. " + error.message });
     }
 });
+
+routes.get('/', async(req, res) => {
+
+    try {
+
+        const users = await userService.listUsers()
+
+        if(users.length < 1){
+            return res.status(204).end();
+        }
+
+    } catch (error) {
+        
+    }
+
+})
 
 export default routes;

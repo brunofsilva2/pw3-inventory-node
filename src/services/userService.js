@@ -22,4 +22,14 @@ async function createUser(name, email, password, user_type) {
     }
 }
 
-export default {createUser}
+async function listUsers(){
+
+    const conn = await database.connect();
+    const sql = "SELECT * FROM users WHERE soft_delete = 0";
+    const [rows] = await conn.query(sql);
+    conn.end();
+    return rows;
+
+}
+
+export default {createUser, listUsers}
