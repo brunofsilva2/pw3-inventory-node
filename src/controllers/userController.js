@@ -1,6 +1,5 @@
 import express from 'express';
 import service from '../services/userService.js';
-import userService from '../services/userService.js';
 
 const routes = express.Router();
 
@@ -32,7 +31,7 @@ routes.post('/', async(req, res) => {
         const result = await service.createUser(name, email, password, user_type);
 
         if (!result.success) {
-            return res.status(400).send(result); // Retorna o erro do serviço, se houver
+            return res.status(400).send(result);
         }
 
         return res.status(201).send({ success: true, message: "Usuário cadastrado com sucesso."})
@@ -47,7 +46,7 @@ routes.get('/', async(req, res) => {
 
     try {
 
-        const users = await userService.listUsers()
+        const users = await service.listUsers()
 
         if(users.length < 1){
             return res.status(204).end();
