@@ -1,14 +1,14 @@
 import database from '../repository/mysql.js'
 
 async function createProducts(name, description, quantity, min_stock, price, categoria_id){
-    const conn = database.connect();
+    const conn = await database.connect();
 
     try {
 
-        const [productName] = (await conn).query('SELECT id FROM products WHERE product_name = ?', [name])
+        const [category] = await conn.query('SELECT id FROM categories WHERE id = ?', [categoria_id]);
 
-        if(productName.length > 1) {
-            return { success: false, message: "Já existe um produto com este nome, especifique o laboratório e/ou a quantidade." }
+        if (category.length === 0) {
+            return { success: false, message: "Categoria não encontrada." };
         }
 
         const productData = `INSERT INTO products 
@@ -31,7 +31,7 @@ async function deleteProducts(id){
     const conn = await database.connect();
 
     try {
-        const sql = "DELETE FROM Products WHERE id = ?"
+        const sql = "DELETE FROM products WHERE id = ?"
         await conn.query(sql, [id]);
         return { success: true, message: `Produto deletado com sucesso.`}
     } catch (error) {
