@@ -8,6 +8,8 @@ routes.post('', async (req, res) => {
 
     try {
 
+        console.log(name, description, quantity, min_stock, price, categoria_id);
+
         if(!name || !description || !quantity || !min_stock || !price || !categoria_id){
             return res.status(400).send({ success: false, message: "Preencha todos os campos obrigatórios" }); 
         }
