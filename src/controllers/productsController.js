@@ -3,7 +3,7 @@ import productsService from '../services/productsService.js';
 
 const routes = express.Router();
 
-routes.post('', async (req, res) => {
+routes.post('/', async (req, res) => {
     const {name, description, quantity, min_stock, price, categoria_id} = req.body;
 
     try {
@@ -30,6 +30,32 @@ routes.post('', async (req, res) => {
         return res.status(500).send({ success: false, message: "Erro interno do servidor.", error: error.message });
     }
 });
+
+routes.put('/:id', async (req, res) => {
+    const productId = parseInt(req.params.id, 10);
+    const {name, description, quantity, min_stock, price, categoria_id} = req.body;
+
+    try{
+
+    if(!name || !description || !quantity || !min_stock || !price || !categoria_id){
+        return res.status(400).send({ success: false, message: "Preencha todos os campos obrigatórios" }); 
+    }
+
+    if(name.length > 100){
+        return res.status(400).send({ success: false, message: "O nome do produto não pode ter mais de 100 caracteres" });
+    }
+
+    const result = await productsService.updateProducts(productId, name, description, quantity, min_stock, price, categoria_id);
+
+    if(!result.success) {
+        return res.status(400).send({ message: result.message });
+    }
+
+    return res.status(200).send({ success: true, message: result.message });
+    } catch(error) {
+        return res.status(500).send({ success: false, message: "Erro interno" + error.message })
+    }
+})
 
 routes.get('/', async (request, response) => {
     try {

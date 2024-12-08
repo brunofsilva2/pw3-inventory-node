@@ -27,6 +27,44 @@ async function createProducts(name, description, quantity, min_stock, price, cat
     }
 }
 
+async function updateProducts(id, name, description, quantity, min_stock, price, categoria_id) {
+    const conn = await database.connect();
+
+    try {
+        const [category] = await conn.query('SELECT id FROM categories WHERE id = ?', [categoria_id]);
+
+        if (category.length < 1) {
+            return { success: false, message: "Categoria não encontrada." };
+        }
+
+        const updateQuery = `
+            UPDATE products
+            SET 
+                product_name = ?, 
+                product_description = ?, 
+                quantity = ?, 
+                min_stock = ?, 
+                price = ?, 
+                categoria_id = ?
+            WHERE id = ?
+        `;
+
+        const updateData = [name, description, quantity, min_stock, price, categoria_id, id];
+        const [result] = await conn.query(updateQuery, updateData);
+
+        if (result.affectedRows === 0) {
+            return { success: false, message: "Produto não encontrado para atualização." };
+        }
+
+        return { success: true, message: `Produto "${name}" atualizado com sucesso!` };
+    } catch (error) {
+        return { success: false, message: "Erro ao atualizar produto: " + error.message };
+    } finally {
+        conn.end();
+    }
+}
+
+
 async function deleteProducts(id){
     const conn = await database.connect();
 
@@ -49,4 +87,4 @@ async function listProducts(){
     return rows;
 }
 
-export default {createProducts, listProducts, deleteProducts}
+export default {createProducts, listProducts, deleteProducts, updateProducts}

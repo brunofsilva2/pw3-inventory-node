@@ -1,0 +1,72 @@
+create database inventory;
+
+use inventory;
+
+CREATE TABLE users(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    user_type ENUM('admin', 'user') NOT NULL
+);
+
+CREATE TABLE products(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(100) NOT NULL,
+    product_description TEXT,
+    quantity INT NOT NULL DEFAULT 0,
+    min_stock INT NOT NULL DEFAULT 0,
+    price DECIMAL(10, 2) NOT NULL
+);
+
+select * from products;
+
+CREATE TABLE categories(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT
+);
+
+ALTER TABLE products 
+ADD COLUMN categoria_id INT,
+ADD FOREIGN KEY (categoria_id) REFERENCES categories(id) ON DELETE SET NULL;
+
+INSERT INTO categories (nome, description) 
+VALUES 
+('Medicamentos', 'Produtos farmacêuticos e medicamentos');
+
+INSERT INTO products (product_name, product_description, quantity, min_stock, price, categoria_id) 
+VALUES 
+('Paracetamol', 'Medicamento para alívio de dores e febre', 50, 10, 5.00, 1),
+('Amoxicilina', 'Antibiótico para infecções bacterianas', 30, 5, 15.00, 1),
+('Ibuprofeno', 'Medicamento anti-inflamatório', 40, 10, 8.50, 1),
+('Omeprazol', 'Medicamento para problemas gástricos', 60, 15, 12.00, 1);
+
+CREATE TABLE stockmovements(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    movement_type ENUM('entrada', 'saída', 'transferência') NOT NULL,
+    quantity INT NOT NULL,
+    movement_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    user_id INT NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE transfers(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    from_location VARCHAR(100) NOT NULL,
+    to_location VARCHAR(100) NOT NULL,
+    quantity INT NOT NULL,
+    transfer_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    user_id INT NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE stockalerts(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    alert_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
